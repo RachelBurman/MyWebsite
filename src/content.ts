@@ -275,6 +275,46 @@ export const JOURNAL: JournalEntry[] = [
   },
 ]
 
+export interface GamingItem {
+  name: string
+  note: string
+}
+
+export const GAMING: GamingItem[] = [
+  {
+    name: 'PC',
+    note: 'Custom build. Mostly used for games I tell myself are educational.',
+  },
+  {
+    name: 'Xbox One',
+    note: 'Still going. Mostly: anything with a good story and no time pressure.',
+  },
+  {
+    name: 'Meta Quest 2',
+    note: 'Beat Saber counts as cardio. This is non-negotiable.',
+  },
+]
+
+export interface WorkshopItem {
+  name: string
+  note: string
+}
+
+export const WORKSHOP: WorkshopItem[] = [
+  {
+    name: 'Bambu Lab A1 Mini',
+    note: 'Prints things I then lose. Currently: a replacement part for the toolbox drawer.',
+  },
+  {
+    name: 'Toolbox',
+    note: 'More complete than it looks. Ask before you borrow anything.',
+  },
+  {
+    name: 'Knitting',
+    note: 'Currently: a dark green jumper. It will be finished eventually. Probably.',
+  },
+]
+
 export const GUESTBOOK_NOTE = {
   body: [
     'Hi. If you found this site, you probably know me, or you\'re a recruiter, or you got lost. All three are welcome.',
