@@ -1,0 +1,85 @@
+@import "tailwindcss";
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --wood:      #a8835e;
+  --wood2:     #8a6644;
+  --lamp-grad: rgba(255,220,140,0.35);
+  --ambient:   rgba(255,225,150,0.25);
+  --desk-bg:   #a8835e;
+}
+
+html { transition: background 3s ease; }
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--desk-bg, #a8835e);
+  color: #1f1a14;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+[data-time="day"] {
+  --wood:      #a8835e;
+  --wood2:     #8a6644;
+  --lamp-grad: rgba(255,220,140,0.35);
+  --ambient:   rgba(255,225,150,0.25);
+  --desk-bg:   #a8835e;
+}
+
+[data-time="golden"] {
+  --wood:      #b8874a;
+  --wood2:     #9a6c30;
+  --lamp-grad: rgba(255,180,60,0.6);
+  --ambient:   rgba(255,180,60,0.45);
+  --desk-bg:   #b8874a;
+}
+
+[data-time="dusk"] {
+  --wood:      #7a5e40;
+  --wood2:     #5c4228;
+  --lamp-grad: rgba(200,150,100,0.5);
+  --ambient:   rgba(200,150,100,0.4);
+  --desk-bg:   #6e5238;
+}
+
+[data-time="night"] {
+  --wood:      #3e2a14;
+  --wood2:     #2c1c0a;
+  --lamp-grad: rgba(255,200,100,0.7);
+  --ambient:   rgba(255,200,100,0.55);
+  --desk-bg:   #2e1e0c;
+}
+
+/* ── View transitions ───────────────────────────────────────────────────── */
+
+/* Forward: new page zooms out from the clicked desk object's centre.
+   --vt-x / --vt-y are set in px on <html> just before startViewTransition. */
+@keyframes vt-zoom-in    { from { transform: scale(0.05); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes vt-forward-out { from { opacity: 1; } to { opacity: 0; } }
+
+/* Back: content page zooms back down to the desk object it came from. */
+@keyframes vt-zoom-out { from { transform: scale(1); opacity: 1; } to { transform: scale(0.05); opacity: 0; } }
+@keyframes vt-back-in  { from { opacity: 0; } to { opacity: 1; } }
+
+[data-nav-direction="forward"]::view-transition-new(root) {
+  transform-origin: var(--vt-x, 50%) var(--vt-y, 50%);
+  animation: vt-zoom-in 0.4s cubic-bezier(0.2, 0, 0.2, 1) forwards;
+}
+[data-nav-direction="forward"]::view-transition-old(root) {
+  animation: vt-forward-out 0.25s ease forwards;
+}
+
+[data-nav-direction="back"]::view-transition-old(root) {
+  transform-origin: var(--vt-x, 50%) var(--vt-y, 50%);
+  animation: vt-zoom-out 0.55s cubic-bezier(0.2, 0, 0.2, 1) forwards;
+}
+[data-nav-direction="back"]::view-transition-new(root) {
+  animation: vt-back-in 0.45s ease forwards;
+}
