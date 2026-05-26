@@ -146,6 +146,15 @@ export function PanelContent({ id }: { id: string }) {
                 <span style={{ fontFamily: dT.mono, fontSize: 10, color: dT.accent, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
                   {p.status} · {p.year}
                 </span>
+                {p.url && (
+                  <a href={p.url} target="_blank" rel="noopener noreferrer" style={{
+                    fontFamily: dT.mono, fontSize: 10, color: dT.faded,
+                    letterSpacing: '0.08em', textDecoration: 'none',
+                    borderBottom: `1px solid ${dT.faded}55`,
+                  }}>
+                    {p.url.includes('github.com') ? 'github ↗' : 'paper ↗'}
+                  </a>
+                )}
               </div>
               <div style={{ fontFamily: dT.serif, fontStyle: 'italic', fontSize: 13, color: dT.faded, marginBottom: 8 }}>{p.full}</div>
               <p style={{ fontFamily: dT.body, fontSize: 14, lineHeight: 1.55, margin: 0 }}>{p.blurb}</p>

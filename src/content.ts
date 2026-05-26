@@ -12,9 +12,50 @@ export interface Project {
   blurb: string
   status: string
   year: string
+  url?: string
 }
 
 export const PROJECTS: Project[] = [
+  {
+    slug: 'my-website',
+    title: 'This website',
+    full: 'Personal site, RachelBurman.com',
+    blurb:
+      'Built an entire nautical point-and-click adventure game rather than write a normal About Me page. The parrot is load-bearing.',
+    status: 'Active',
+    year: '2026',
+    url: 'https://github.com/RachelBurman/MyWebsite',
+  },
+  {
+    slug: 'alchemists-tower',
+    title: "The Alchemist's Tower",
+    full: 'DQN agent in a procedurally generated roguelike',
+    blurb:
+      'A procedurally generated roguelike tower where a Deep Q-Network (DQN) agent learns to collect ingredients, craft potions, and climb as high as possible.',
+    status: 'Complete',
+    year: '2026',
+    url: 'https://github.com/RachelBurman/TheAlchemistsTower',
+  },
+  {
+    slug: 'meridian',
+    title: 'MERIDIAN',
+    full: 'Autonomous FCA publication monitor and briefing agent',
+    blurb:
+      'An autonomous agent that monitors FCA publications, classifies by urgency, and delivers structured briefings.',
+    status: 'Complete',
+    year: '2026',
+    url: 'https://github.com/RachelBurman/MERIDIAN',
+  },
+  {
+    slug: 'holdfast',
+    title: 'HOLDFAST',
+    full: 'LLM evaluation for factual sycophancy resistance',
+    blurb:
+      'An Inspect (UK AISI) evaluation that measures whether language models maintain correct factual answers when a user confidently asserts a wrong alternative — without providing any supporting evidence.',
+    status: 'Active',
+    year: '2026',
+    url: 'https://github.com/RachelBurman/Holdfast',
+  },
   {
     slug: 'scalpel',
     title: 'SCALPEL',
@@ -23,6 +64,7 @@ export const PROJECTS: Project[] = [
       'A personal AI research assistant that summarises, critiques, and cross-references academic papers. Features a Bullshit Score — because some papers need one.',
     status: 'Active',
     year: '2025',
+    url: 'https://github.com/RachelBurman/SCALPEL',
   },
   {
     slug: 'fenetre',
@@ -32,6 +74,7 @@ export const PROJECTS: Project[] = [
       'Multicentre, non-inferiority randomised controlled trial examining community-based monitoring of nAMD in optometry practices. Responsible for all statistical analysis per the SAP.',
     status: 'Published',
     year: '2024',
+    url: 'https://papers.ssrn.com/sol3/papers.cfm?abstract_id=5278556',
   },
   {
     slug: 'food-graph',
@@ -41,6 +84,7 @@ export const PROJECTS: Project[] = [
       'Built a GNN on a Neo4j flavour knowledge graph to generate novel ingredient combinations using GPT-3.5. Because someone had to.',
     status: 'Completed',
     year: '2023',
+    url: 'https://github.com/RachelBurman/MScDissWork',
   },
   {
     slug: 'pose',
@@ -50,6 +94,7 @@ export const PROJECTS: Project[] = [
       'Multi-camera 3D pose estimation system using a coordinated array of Nvidia Jetson TX2 edge devices for real-time human action recognition.',
     status: 'Rebuilding',
     year: '2023',
+    url: 'https://github.com/RachelBurman/Dissertation',
   },
 ]
 
