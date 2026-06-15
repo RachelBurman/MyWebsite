@@ -224,13 +224,18 @@ export const USES: UsesCategory[] = [
   },
 ]
 
+export type BodyItem =
+  | string
+  | { heading: string; level?: 2 | 3 }
+  | { link: string; href: string }
+
 export interface Post {
   slug: string
   title: string
   date: string
   readTime: string
   tag: string
-  body: string[]
+  body: BodyItem[]
 }
 
 export const POSTS: Post[] = [
@@ -268,6 +273,63 @@ export const POSTS: Post[] = [
       'I read a lot of papers. Some of them are genuinely brilliant. Most are fine. A non-trivial slice are dressed-up nothing.',
       "SCALPEL is a small tool that summarises, critiques, and cross-references academic papers. The Bullshit Score isn't a gimmick — it's a forcing function. If you have to commit to a number, you have to be specific about what's wrong.",
       "It's also funny, which is allowed.",
+    ],
+  },
+  {
+    slug: 'fable-recipe-app',
+    title: 'I Built the Recipe App That People With Food Allergies Actually Need',
+    date: 'Jun 2026',
+    readTime: '9 min',
+    tag: 'Building',
+    body: [
+      "There's a moment that a lot of people with food allergies know well.",
+      "You're standing in your kitchen. You have ingredients. You're hungry. You open a recipe app and you're immediately confronted with a wall of dishes you can't eat — or worse, recipes that claim to be \"gluten-free\" but are built on string matching and good intentions rather than actual ingredient knowledge. Oat milk is safe for dairy allergies but contains gluten — unsafe for coeliac users. Almond milk is safe for dairy allergies but not for tree nut allergies. A \"nut-free\" recipe that still calls for marzipan.",
+      "For someone with a straightforward intolerance, that's annoying. For someone with MCAS — Mast Cell Activation Syndrome — or a severe allergy, it's not just annoying. It can be dangerous. And for someone in Safe Foods Mode, where they can only eat a specific list of ten ingredients they know won't trigger a reaction, every existing recipe app is essentially useless.",
+      "I built Fable because nobody had built this properly.",
+      { heading: 'The backstory' },
+      "Three years ago, my MSc dissertation built an ingredient embedding system using Neo4j, GraphSAGE, and GPT-3.5 to generate novel recipes. Part of that research identified the western bias in food datasets and flagged allergen-aware generation as the obvious next step. I flagged it and moved on.",
+      "Then, on 26 May 2026 — three weeks before the submission deadline — Epicure was published on arXiv by Radzikowski and Chen at KAIKAKU.AI. The largest multilingual food embedding model ever trained: 4.14 million recipes, 7 languages, 1,790 ingredients compressed into 2MB of vector space. They'd solved the dataset problem I'd been thinking about for three years. But they hadn't built the application layer.",
+      "Hack the Zero Stack with Vercel and AWS Databases gave me the reason to finally build it. Fable is that application layer.",
+      { heading: 'What Fable does' },
+      "Fable is an allergen-aware recipe discovery and generation app. You tell it what you can't eat. It tells you what you can cook.",
+      "Every one of Epicure's 1,790 ingredients is explicitly classified against the EU Big 14 allergens — O(1) lookup, no string matching, no false positives. Oat milk is safe for dairy allergies but contains gluten — unsafe for coeliac users. Almond milk is safe for dairy allergies but not for tree nut allergies. Apple cider is alcoholic in the UK. Fable knows all of this because it was taught it, not because it guessed.",
+      "Safe Foods Mode — the feature no other recipe app has. For MCAS and severe allergy users who can only eat a specific list of ingredients, recipe generation is strictly constrained to that list. \"Liquid of choice\" and \"seasoning of choice\" placeholders exist because for some users, even water isn't a safe assumption.",
+      "\"Why is this safe for me?\" — a Claude Haiku call that reads your specific allergen profile, diet presets, and Safe Foods Mode and explains in plain English exactly why this recipe is safe for you. Not a generic disclaimer. A personalised explanation. For someone with a severe allergy, that transparency is the difference between trusting the app and not.",
+      "Agentic recipe generation — two-step flow where Claude Haiku reasons over your taste history and writes a recipe brief before Claude Sonnet generates the recipe. The agent thinks out loud. You can see its reasoning while it works. You can steer it mid-flight with nudge buttons — make it spicier, go vegetarian, try a different cuisine — and AbortController silently cancels the in-flight request while the brief card updates seamlessly. It never feels like a restart.",
+      "Role-aware substitution — when a recipe calls for something you can't have, Fable finds the nearest safe substitute using Epicure's embedding geometry. The engine understands what the ingredient does in the dish — fat, binding, acidity — and finds something that performs the same function. Pasta cannot substitute for cheese in a pasta bake, even if they frequently appear together in the training data.",
+      "Personalised taste profile — every like and dislike feeds a preference model. A drift-aware background process running on EventBridge Scheduler detects emerging and fading tastes. Flavour territory is computed from the geometric intersection of your top-5 preferred ingredients' embedding neighbourhoods. Pre-computed recipe suggestions surface in the Discover tab before you ask for them.",
+      "Diet and lifestyle presets — Vegan, Vegetarian, Keto, Low-FODMAP, Lactose Intolerance (two sub-modes), No Alcohol (UK-aware, two sub-modes), Low Histamine (85+ Epicure-verified keys, medical disclaimer).",
+      "7 languages — ships in all 7 languages Epicure was trained on: English, Spanish, French, German, Italian, Simplified Chinese, Japanese. Browser locale auto-detected. Adding a new language is one JSON file.",
+      { heading: 'The technical story' },
+      "The AWS architecture is the spine of the product, not a bolt-on.",
+      "Seven DynamoDB tables, each deliberate. fable-feedback has a DynamoDB Stream enabled. Every like and dislike fires a Lambda — fable-feedback-stream-processor — that extracts ingredient preference signals and writes them to fable-users. A GSI on needsRecompute means a separate Lambda only processes users who have new feedback, not the entire table.",
+      "That second Lambda — fable-taste-profile-writer — is triggered by EventBridge Scheduler every six hours. It runs computeDriftAwareProfile, comparing recent taste history against all-time preferences to surface emerging and fading ingredients. Then it calls Claude Haiku to generate personalised recipe suggestions and writes a StoredTasteProfile back to DynamoDB.",
+      "This all runs in the background, independent of user action. When you open the Discover tab, those suggestions are already there. When you tap one, generation is instant — the background Lambda did the work hours ago.",
+      "Four Lambda functions, each scoped to least-privilege IAM. The barcode scanner has zero DynamoDB access because it doesn't touch DynamoDB. Every permission is justified, documented, and enforced.",
+      "The monetisation boundary is already enforced at the infrastructure level. Guests cost nothing to serve — allergen filtering, Safe Foods Mode, community recipes, all free. Authenticated users are rate-limited by atomic dual-window counters in fable-rate-limits using TransactWriteItems. The free/paid split is not a future feature. It's how the app works today. Nobody should be locked out of knowing what they can safely eat — but AI generation costs money to run, and Fable is one Stripe webhook away from a sustainable freemium model.",
+      "Fable ships in all 7 languages Epicure was trained on. If Epicure's training corpus spans 7 languages, the application layer should too. Adding a new language is a single JSON file — no code changes, no infrastructure changes.",
+      { heading: 'Two things that broke and what I learned' },
+      { heading: 'next-intl 404\'d the entire app on Vercel.', level: 3 },
+      "The integration worked perfectly in development. On Vercel, every route returned 404.",
+      "The root cause: createMiddleware from next-intl internally rewrites / to /en/ via x-middleware-rewrite, even with localePrefix: 'never' explicitly set. Without an app/[locale]/ directory structure, every rewritten path returns 404.",
+      "The fix: stop using next-intl's middleware for routing entirely. Locale is now detected in i18n/request.ts directly from the NEXT_LOCALE cookie with Accept-Language header as fallback. The middleware is a no-op. No rewrites, no 404s, locale detection still works.",
+      "The lesson: the behaviour was spec-correct but the sharp edge wasn't visible from the docs alone. Reading the middleware source would have caught it sooner.",
+      { heading: 'The substitution scoring threshold that wasn\'t.', level: 3 },
+      "The substitution engine originally penalised candidates whose average cosine similarity to the other ingredients in the dish exceeded 0.7 — treating them as co-ingredients rather than genuine substitutes.",
+      "The problem: 0.7 is an arbitrary number against Epicure's embedding space. A dense five-ingredient context could push a legitimate substitute above 0.7 by coincidence. There was also a cliff artefact: a score of 0.699 got a bonus, 0.701 got a penalty — a 0.41 point swing with no semantic justification.",
+      "The fix: self-calibrating relative penalty. Instead of \"is contextFit above 0.7?\", the engine asks \"is this candidate more similar to the surrounding dish than to the ingredient it's replacing?\" If averageContextFit > similarityToOriginal + 0.15, it's penalised as a co-ingredient.",
+      "The lesson: empirical thresholds in embedding spaces need justification. When you can't validate a threshold against the distribution, make it relative. Self-calibrating penalties are more honest than magic numbers.",
+      { heading: 'Try it' },
+      { link: 'Live app', href: 'https://v0-allergen-recipe-app.vercel.app' },
+      "The app works fully without an account — allergen filtering, kitchen management, Safe Foods Mode, community recipes. Sign up to unlock AI generation.",
+      { link: 'GitHub', href: 'https://github.com/RachelBurman/Fabel' },
+      { heading: "What's next" },
+      "After the hackathon: migrating auth from Neon to AWS RDS Postgres, adding social auth, and thinking seriously about what Fable looks like as a real product.",
+      "The monetisation model is usage-based freemium. The infrastructure already enforces it. The question worth taking seriously is the right price point for users who genuinely need this — people for whom a bad recipe suggestion isn't an inconvenience but a health risk.",
+      "If you have food allergies or know someone who does — try it. Tell me what's missing.",
+      "— Rachel Burman",
+      "Research Assistant, King's College London",
+      "Hack the Zero Stack with Vercel and AWS Databases — June 2026 · #H0Hackathon",
     ],
   },
 ]

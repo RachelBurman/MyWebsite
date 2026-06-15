@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
 import { flushSync } from 'react-dom'
-import { POSTS } from '../content'
+import { POSTS, type BodyItem } from '../content'
 import { dT } from '../lib/theme'
 import * as AT from '../lib/atproto'
 
@@ -60,7 +60,9 @@ function PostPage() {
   const dateDisplay: string   = staticPost ? staticPost.date        : AT.formatDisplayDate(atPost!.value.publishedAt)
   const tag:         string   = staticPost ? staticPost.tag         : (atPost!.value.tags?.[0] ?? 'Post')
   const readTime:    string   = staticPost ? staticPost.readTime    : AT.estimateReadTime(atPost!.value.textContent ?? '')
-  const body:        string[] = staticPost ? staticPost.body        : (atPost!.value.textContent ?? '').split(/\n\n+/).filter(Boolean)
+  const body: BodyItem[] = staticPost
+    ? staticPost.body
+    : (atPost!.value.textContent ?? '').split(/\n\n+/).filter(Boolean)
 
   return (
     <div style={{ minHeight: '100vh', background: dT.paper, color: dT.ink }}>
@@ -80,11 +82,22 @@ function PostPage() {
         <h1 style={{ fontFamily: dT.serif, fontSize: 38, fontWeight: 400, lineHeight: 1.15, margin: '0 0 32px', color: dT.ink }}>
           {title}
         </h1>
-        {body.map((para, i) => (
-          <p key={i} style={{ fontFamily: dT.serif, fontSize: 16, lineHeight: 1.75, margin: '0 0 18px', color: dT.ink }}>
-            {para}
-          </p>
-        ))}
+        {body.map((item, i) => {
+          if (typeof item === 'string') {
+            return <p key={i} style={{ fontFamily: dT.serif, fontSize: 16, lineHeight: 1.75, margin: '0 0 18px', color: dT.ink }}>{item}</p>
+          }
+          if ('heading' in item) {
+            const level = item.level ?? 2
+            return level === 3
+              ? <h3 key={i} style={{ fontFamily: dT.serif, fontSize: 18, fontWeight: 400, margin: '32px 0 10px', color: dT.ink }}>{item.heading}</h3>
+              : <h2 key={i} style={{ fontFamily: dT.serif, fontSize: 24, fontWeight: 400, margin: '48px 0 14px', color: dT.ink }}>{item.heading}</h2>
+          }
+          if ('link' in item) {
+            return <p key={i} style={{ fontFamily: dT.serif, fontSize: 16, lineHeight: 1.75, margin: '0 0 18px' }}>
+              <a href={item.href} target="_blank" rel="noopener noreferrer" style={{ color: dT.accent, textDecoration: 'none' }}>{item.link} ↗</a>
+            </p>
+          }
+        })}
       </main>
     </div>
   )
