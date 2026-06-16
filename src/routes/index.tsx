@@ -299,12 +299,13 @@ function ParchmentPopup({ objId, verbId, onClose }: {
 }
 
 // ─── Hit area wrapper ─────────────────────────────────────────────────────────
-function Hit({ id, children, onHit, onHover, outlineX, outlineY, outlineW, outlineH }: {
+function Hit({ id, children, onHit, onHover, outlineX, outlineY, outlineW, outlineH, outlineCx, outlineCy, outlineR }: {
   id: string
   children: React.ReactNode
   onHit: (id: string) => void
   onHover: (id: string | null) => void
-  outlineX: number; outlineY: number; outlineW: number; outlineH: number
+  outlineX?: number; outlineY?: number; outlineW?: number; outlineH?: number
+  outlineCx?: number; outlineCy?: number; outlineR?: number
 }) {
   return (
     <g className="hit"
@@ -312,8 +313,10 @@ function Hit({ id, children, onHit, onHover, outlineX, outlineY, outlineW, outli
       onMouseEnter={() => onHover(id)}
       onMouseLeave={() => onHover(null)}>
       {children}
-      <rect className="hit-outline"
-        x={outlineX} y={outlineY} width={outlineW} height={outlineH} />
+      {outlineR != null
+        ? <circle className="hit-outline" cx={outlineCx} cy={outlineCy} r={outlineR} />
+        : <rect className="hit-outline" x={outlineX} y={outlineY} width={outlineW} height={outlineH} />
+      }
     </g>
   )
 }
@@ -691,7 +694,7 @@ function CabinScene({ onHit, onHover }: {
 
       {/* ── BICYCLE WHEEL (far right, propped) ── */}
       <Hit id="wheel" onHit={onHit} onHover={onHover}
-        outlineX={856} outlineY={376} outlineW={104} outlineH={188}>
+        outlineCx={908} outlineCy={482} outlineR={72}>
         <ellipse cx="908" cy="558" rx="50" ry="4" fill="#1a0e06" opacity="0.65" />
         {/* tyre */}
         <circle cx="908" cy="482" r="68" fill="none" stroke="#1a0e06"  strokeWidth="10" />
